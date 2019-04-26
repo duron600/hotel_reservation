@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'hotel_picker'
+require 'date'
+
+input_pattern = /^(Regular|Rewards):(\s\w+,?)+$/
+
+if ARGV.join(' ').match input_pattern
+
+  customer_type = ARGV.shift[/\w+/]
+  dates = ARGV.map{|arg| Date.parse arg}
+
+  hotel_picker = HotelPicker.new(customer_type, *dates)
+  
+  [
+    ['Lakewood', 3, 110, 90, 80, 80],
+    ['Bridgewood', 4, 160, 60, 110, 50],
+    ['Ridgewood', 5, 220, 150, 100, 40]
+  ].each do |data|
+    hotel = HotelPicker::Hotel.new
+
+    hotel.name = data[0]
+    hotel.rating = data[1]
+    hotel.regular_weekday_rates = data[2]
+    hotel.regular_weekend_rates = data[3]
+    hotel.rewards_weekday_rates = data[4]
+    hotel.rewards_weekend_rates = data[5]
+
+    hotel_picker.add_hotel hotel
+  end
+  
+  puts hotel_picker.pick
+else
+  puts "USAGE: cheapest_hotel <Regualr|Rewards>: <date1>, <date2>, ..."
+end
